@@ -10,6 +10,19 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+
+  movementsDates: [
+    '2019-11-18T21:31:17.178Z',
+    '2019-12-23T07:42:02.383Z',
+    '2020-01-28T09:15:04.904Z',
+    '2020-04-01T10:17:24.185Z',
+    '2020-05-08T14:11:59.604Z',
+    '2020-05-27T17:01:17.194Z',
+    '2020-07-11T23:36:17.929Z',
+    '2020-07-12T10:51:36.790Z',
+  ],
+  currency: 'EUR',
+  locale: 'pt-PT', // de-DE
 };
 
 const account2 = {
@@ -17,6 +30,19 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account3 = {
@@ -24,6 +50,19 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+
+  movementsDates: [
+    '2019-11-18T21:31:17.178Z',
+    '2019-12-23T07:42:02.383Z',
+    '2020-01-28T09:15:04.904Z',
+    '2020-04-01T10:17:24.185Z',
+    '2020-05-08T14:11:59.604Z',
+    '2020-05-27T17:01:17.194Z',
+    '2020-07-11T23:36:17.929Z',
+    '2020-07-12T10:51:36.790Z',
+  ],
+  currency: 'EUR',
+  locale: 'pt-PT', // de-DE
 };
 
 const account4 = {
@@ -31,6 +70,19 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -61,19 +113,30 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (movements, sort = false) {
+// Functions
+
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
 
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort
+    ? acc.movements.slice().sort((a, b) => a - b)
+    : acc.movements;
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+    const date = new Date(acc.movementsDates[i]);
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    const displayDate = `${day}/${month}/${year}`;
+
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${mov}€</div>
+    <div class="movements__date">${displayDate}<div>
+          <div class="movements__value">${mov.toFixed(2)}€</div>
         </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -84,7 +147,7 @@ const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce(function (acc, mov) {
     return acc + mov;
   }, 0);
-  labelBalance.textContent = `${acc.balance}€`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
 };
 
 const calcDisplaySummary = function (acc) {
@@ -95,7 +158,7 @@ const calcDisplaySummary = function (acc) {
     .reduce(function (acc, mov) {
       return acc + mov;
     }, 0);
-  labelSumIn.textContent = `${incomes}€`;
+  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
 
   const out = acc.movements
     .filter(function (mov) {
@@ -104,7 +167,7 @@ const calcDisplaySummary = function (acc) {
     .reduce(function (acc, mov) {
       return acc + mov;
     }, 0);
-  labelSumOut.textContent = `${Math.abs(out)}€`;
+  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
 
   const interest = acc.movements
     .filter(function (mov) {
@@ -120,7 +183,7 @@ const calcDisplaySummary = function (acc) {
     .reduce(function (acc, int) {
       return acc + int;
     }, 0);
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
 };
 
 const createUsernames = function (accs) {
@@ -136,7 +199,7 @@ createUsernames(accounts);
 
 const updateUI = function (acc) {
   // Display movements
-  displayMovements(acc.movements);
+  displayMovements(acc);
   //Display balance
   calcDisplayBalance(acc);
   // Display summary
@@ -146,6 +209,11 @@ const updateUI = function (acc) {
 // Event handlers
 let currentAccount;
 
+// Fake Always Logged In
+currentAccount = account1;
+updateUI(currentAccount);
+containerApp.style.opacity = 100;
+
 btnLogin.addEventListener('click', function (e) {
   // Prevent form from submitting
   e.preventDefault();
@@ -154,13 +222,21 @@ btnLogin.addEventListener('click', function (e) {
     return acc.username === inputLoginUsername.value;
   });
   console.log(currentAccount);
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +inputLoginPin.value) {
     // Display UI and welcome message
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[0]
     }`;
     containerApp.style.opacity = 100;
     // Clear input fields
+    const now = new Date();
+    const day = `${now.getDate()}`.padStart(2, 0);
+    const month = `${now.getMonth() + 1}`.padStart(2, 0);
+    const year = `${now.getFullYear()}`;
+    const hour = `${now.getHours()}`.padStart(2, 0);
+    const min = `${now.getMinutes()}`.padStart(2, 0);
+    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
@@ -174,7 +250,7 @@ btnClose.addEventListener('click', function (e) {
 
   if (
     currentAccount.username === inputCloseUsername.value &&
-    currentAccount.pin === Number(inputClosePin.value)
+    currentAccount.pin === +inputClosePin.value
   ) {
     const index = accounts.findIndex(function (acc) {
       return acc.username === currentAccount.username;
@@ -191,12 +267,13 @@ btnClose.addEventListener('click', function (e) {
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
 
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(inputLoanAmount.value);
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     // Add movements
     currentAccount.movements.push(amount);
-
+    // Add loan date
+    currentAccount.movementsDates.push(new Date().toISOString());
     // Update UI
     updateUI(currentAccount);
   }
@@ -205,7 +282,7 @@ btnLoan.addEventListener('click', function (e) {
 
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const receiverAcc = accounts.find(function (acc) {
     return acc.username === inputTransferTo.value;
   });
@@ -220,6 +297,9 @@ btnTransfer.addEventListener('click', function (e) {
     // Doing the transfer
     currentAccount.movements.push(-amount);
     receiverAcc.movements.push(amount);
+    // Add transfer date
+    currentAccount.movementsDates.push(new Date().toISOString());
+    receiverAcc.movementsDates.push(new Date().toISOString());
 
     // Update UI
     updateUI(currentAccount);
@@ -230,7 +310,7 @@ let sorted = false;
 
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
-  displayMovements(currentAccount.movements, !sorted);
+  displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
 
@@ -527,12 +607,14 @@ console.log(movements.some(deposit));
 console.log(movements.every(deposit));
 console.log(movements.filter(deposit));
 */
+/*
+
 const arr = [[1, 2, , 3], [4, 5, 6], 7, 8];
 console.log(arr.flat());
 
 const arrDeep = [[[1, 2], , 3], [4, [5, 6]], 7, 8];
 console.log(arrDeep.flat(2));
-/*
+
 const accountMovements = accounts.map(function (acc) {
   return acc.movements;
 });
@@ -578,4 +660,341 @@ movements.sort(function (a, b) {
   return a - b;
 });
 console.log(movements);
+*/
+/*
+//empty arrays + fill method
+const arr1 = [1, 2, 3, 4, 5, 6, 7];
+const x = new Array(7);
+console.log(x);
+// console.log(x.map(() => 5));
+// x.fill(1);
+x.fill(1, 3, 5);
+x.fill(1);
+console.log(x);
+
+arr1.fill(23, 2, 6);
+console.log(arr1);
+
+// Array.from
+const y = Array.from({ length: 7 }, function () {
+  return 1;
+});
+console.log(y);
+
+const z = Array.from({ length: 7 }, function (_, i) {
+  return i + 1;
+});
+console.log(z);
+
+const movementsUI = Array.from(document.querySelectorAll('.movements__value'));
+console.log(movementsUI);
+
+labelBalance.addEventListener('click', function () {
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    el => Number(el.textContent.replace('€', ''))
+  );
+  console.log(movementsUI);
+});
+
+
+// 1
+const bankDepositSum = accounts
+  .flatMap(function (acc) {
+    return acc.movements;
+  })
+  .filter(function (acc) {
+    return acc > 0;
+  })
+  .reduce(function (sum, cur) {
+    return sum + cur;
+  }, 0);
+console.log(bankDepositSum);
+*/
+// 2
+// const numDeposits1000 = accounts
+//   .flatMap(function (acc) {
+//     return acc.movements;
+//   })
+//   .filter(function (mov) {
+//     return mov >= 1000;
+//   }).length;
+/*
+const numDeposits1000 = accounts
+  .flatMap(function (acc) {
+    return acc.movements;
+  })
+  .reduce(function (count, cur) {
+    return cur >= 1000 ? ++count : count;
+  }, 0);
+console.log(numDeposits1000);
+
+let a = 10;
+console.log(++a);
+
+// 3
+const { deposits, withdrawals } = accounts
+  .flatMap(function (acc) {
+    return acc.movements;
+  })
+  .reduce(
+    function (sums, cur) {
+      // cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
+      // return sums;
+      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+      return sums;
+    },
+    { deposits: 0, withdrawals: 0 }
+  );
+
+console.log(deposits, withdrawals);
+
+//4
+const convertTitleCase = function (title) {
+  const capitalize = function (str) {
+    return str[0].toUpperCase() + str.slice(1);
+  };
+  const exceptions = ['a', 'an', 'and', 'the', 'but', 'or', 'on', 'in', 'with'];
+
+  const titleCase = title
+    .toLowerCase()
+    .split(' ')
+    .map(function (word) {
+      return exceptions.includes(word) ? word : capitalize(word);
+    })
+    .join(' ');
+  return capitalize(titleCase);
+};
+
+console.log(convertTitleCase(`this is a nice title`));
+console.log(convertTitleCase(`this is a LONG title but not too long`));
+console.log(convertTitleCase(`and here is another title with an EXAMPLE`));
+*/
+/*
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+];
+//1
+dogs.forEach(function (dog) {
+  const recommendedFood = Math.trunc(dog.weight ** 0.75 * 28);
+  dog.recommendedFood = recommendedFood;
+});
+
+// 2
+const dogSarah = dogs.find(function (dog) {
+  return dog.owners.includes('Sarah');
+});
+console.log(dogSarah);
+console.log(
+  `Sarah's dog is eating too ${
+    dogSarah.curFood > dogSarah.recommendedFood ? 'much' : 'little'
+  }`
+);
+
+// 3
+const ownersEatTooMuch = dogs
+  .filter(function (dog) {
+    return dog.curFood > dog.recommendedFood;
+  })
+  .flatMap(function (dog) {
+    return dog.owners;
+  });
+console.log(ownersEatTooMuch);
+
+const ownersEatTooLittle = dogs
+  .filter(function (dog) {
+    return dog.curFood < dog.recommendedFood;
+  })
+  .flatMap(function (dog) {
+    return dog.owners;
+  });
+
+console.log(ownersEatTooLittle);
+
+//4
+console.log(`${ownersEatTooMuch.join(' and ')}'s dogs eat too much!`);
+console.log(`${ownersEatTooLittle.join(' and ')}'s dogs eat too little!`);
+
+// 5
+console.log(
+  dogs.some(function (dog) {
+    return dog.curFood === dog.recommendedFood;
+  })
+);
+
+const checkEatingOkay = function (dog) {
+  return (
+    dog.curFood > dog.recommendedFood * 0.9 &&
+    dog.curFood < dog.recommendedFood * 1.1
+  );
+};
+
+// 6
+console.log(dogs.some(checkEatingOkay));
+
+// 7
+console.log(dogs.filter(checkEatingOkay));
+
+// 8
+const dogsSorted = dogs.slice().sort(function (a, b) {
+  return a.recommendedFood - b.recommendedFood;
+});
+console.log(dogsSorted);
+*/
+/*
+console.log(23 === 23.0);
+
+console.log(0.1 + 0.2);
+console.log(0.1 + 0.2 === 0.3);
+
+// Convert strings to numbers
+console.log(Number('23'));
+console.log(+'23');
+
+// Parsing
+console.log(Number.parseInt('30px', 10));
+console.log(Number.parseInt('e23', 10));
+
+console.log(Number.parseInt('2.5rem'));
+console.log(Number.parseFloat('2.5rem'));
+
+// console.log(parseFloat('   2.5rem'));
+
+console.log(Number.isNaN('20'));
+console.log(Number.isNaN(+'20X'));
+console.log(Number.isNaN(23 / 0));
+
+//Best way of checking if a value is a number
+console.log(Number.isFinite(23));
+console.log(Number.isFinite('23'));
+console.log(Number.isFinite(+'23X'));
+console.log(Number.isFinite(23 / 0));
+*/
+/*
+console.log(Math.sqrt(25));
+console.log(8 ** (1 / 3));
+console.log(Math.max(5, 18, '23', 11, 2));
+console.log(Math.max(5, 18, '23px', 11, 2));
+
+console.log(Math.min(5, 18, '23', 11, 2));
+
+console.log(Math.PI * Number.parseFloat('10px') ** 2);
+
+console.log(Math.trunc(Math.random() * 6) + 1);
+
+const randomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min) + 1) + min;
+console.log(randomInt(10, 20));
+
+// rounding ints
+console.log(Math.trunc(23.3));
+console.log(Math.round(23.9));
+
+console.log(Math.ceil(23.3));
+console.log(Math.ceil(23.9));
+
+console.log(Math.floor(23.3));
+console.log(Math.floor('23.9'));
+
+console.log(Math.floor('-23.9'));
+console.log(Math.trunc('-23.9'));
+
+// Rounding decimals
+console.log((2.7).toFixed(0));
+console.log((2.7).toFixed(3));
+console.log(+(2.345).toFixed(2));
+*/
+/*
+console.log(5 % 2);
+console.log(5 / 2); //5 = 2 * 2 + 1
+
+console.log(8 % 3);
+console.log(8 / 3); //8 = 2 * 3 + 2
+
+console.log(7 % 2);
+console.log(7 / 2);
+
+const isEven = n => n % 2 === 0;
+console.log(isEven(8));
+console.log(isEven(23));
+console.log(isEven(514));
+
+labelBalance.addEventListener('click', function (e) {
+  e.preventDefault();
+  [...document.querySelectorAll('.movements__row')].forEach(function (row, i) {
+    if (i % 2 === 0) row.style.backgroundColor = 'orangered';
+    if (i % 3 === 0) row.style.backgroundColor = 'blue';
+  });
+});
+*/
+/*
+console.log(
+  2 ** 53 - 1
+);
+console.log(Number.MAX_SAFE_INTEGER);
+console.log(2 ** 53 + 1);
+console.log(2 ** 53 + 2);
+console.log(2 ** 53 + 3);
+console.log(2 ** 53 + 4);
+console.log(2 ** 53 + 5);
+
+console.log(9999965464766546565465465465545665654n);
+console.log(BigInt(9999965464766546565465465465545665654));
+
+// Operations
+console.log(10000n + 10000n);
+console.log(10n * 20n);
+
+const huge = 13216546498798432132321n;
+const num = 23;
+console.log(huge * BigInt(num));
+
+// Exceptions
+console.log(20n > 15);
+console.log(20n === 20);
+console.log(typeof 20n);
+console.log(20n == 20);
+
+console.log(huge + ' is REALLY big!');
+
+// Divisions
+console.log(11n / 3n);
+console.log(10 / 3);
+*/
+/*
+// Create a date
+const now = new Date();
+console.log(now);
+console.log(new Date('Mon Feb 15 2021 06:36:04'));
+console.log(new Date('December 24, 2015'));
+console.log(new Date(account1.movementsDates[0]));
+console.log(new Date(2037, 10, 19, 15, 23, 5));
+console.log(new Date(2037, 10, 33));
+
+console.log(new Date(0));
+console.log(new Date(3 * 24 * 60 * 60 * 100));
+*/
+// Working with dates
+/*
+const future = new Date(2037, 10, 19, 15, 23);
+console.log(future);
+console.log(future.getFullYear());
+console.log(future.getMonth());
+console.log(future.getDate());
+console.log(future.getDay());
+console.log(future.getHours());
+console.log(future.getMinutes());
+console.log(future.getSeconds());
+console.log(future.toISOString());
+console.log(future.getTime());
+
+console.log(new Date(2142282180000));
+
+console.log(Date.now());
+
+future.setFullYear(2040);
+console.log(future);
 */
